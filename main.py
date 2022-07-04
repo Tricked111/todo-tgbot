@@ -6,7 +6,7 @@ from datetime import date
 from src.keybord import generate_start_button 
 
 
-API_TOKEN = "5597070596:AAEgZMwOzZLp7IQHqurC0BUi7m5I8wrcm9w"
+API_TOKEN = ""
 bot = TeleBot(API_TOKEN)
 
 @bot.message_handler(commands = ['start'])
