@@ -20,6 +20,10 @@ def start_command_handler(message: types.Message):
 def todo_command_handler(message: types.Message):
     bot.send_message(message.chat.id,'Task list',reply_markup=generate_start_button())
 
+@bot.message_handler(content_types = ["text"])
+def task_list(message : types.Message):
+    if message.text == "view task":
+        bot.send_message(message.chat.id,"You are here!")
 
 
 
