@@ -30,19 +30,20 @@ def todo_command_handler(message: types.Message):
     database.drop_table(curs)
     #delete
     
-    
     create_table(curs)
     bot.send_message(message.chat.id,'Task list',reply_markup=generate_start_button())
-
-
 
 
 @bot.message_handler(content_types = ["text"])
 def task_list(message : types.Message):
     curs = create_cursor(message)
     if message.text == "view task":
-        insert_data(curs,"asd","ASD")
-        bot.send_message(message.chat.id,f"{database.print_select(curs)}")
+        pass
+    if message.text == "create task":
+        pass
+    if message.text == "view calendar":
+        pass
+
 
 
 if __name__ == "__main__":
