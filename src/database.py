@@ -2,7 +2,8 @@ import sqlite3
 from telebot import types,TeleBot
 
 def create_connect(message: types.Message) -> sqlite3.Cursor:
-    return sqlite3.connect(f"src/{message.from_user.id}.db")
+    #print(message.from_user.username)
+    return sqlite3.connect(f"src/{message.from_user.id}.db",check_same_thread=False)
 
 def create_cursor(message: types.Message):
     conn = create_connect(message)
@@ -15,7 +16,7 @@ def drop_table(c):
 
 
 def create_table(c : sqlite3.Cursor):
-        c.execute("""CREATE TABLE tasks (
+        c.execute("""CREATE TABLE if not EXISTS tasks (
                 task text,
                 date text
                     )""")
