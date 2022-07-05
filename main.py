@@ -105,11 +105,4 @@ def write_task(message : types.Message):
 
 
 if __name__ == "__main__":
-    #curs = sqlite3.connect(f"src/test.db")
-    #c = curs.cursor()
-    #create_table(c)
-    #insert_data(c,"date.today()","call.message.text")
-    #print(print_select(c))
-
-
     bot.polling()
