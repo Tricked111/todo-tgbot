@@ -43,7 +43,8 @@ def task_list(message : types.Message):
         pass
     if message.text == "view calendar":
         pass
-
+    else:
+        bot.send_message(message.chat.id,"None")    
 
 
 if __name__ == "__main__":
