@@ -1,36 +1,36 @@
 from ctypes import resize
 from gc import callbacks
 from unittest.mock import call
-from telebot import TeleBot
+from telebot import types
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton,ReplyKeyboardMarkup,KeyboardButton
 
 
 EMTPY_FIELD = '1'
 
-def generate_start_button():
+def generate_start_button() -> types.ReplyKeyboardMarkup:
     keybord = ReplyKeyboardMarkup(resize_keyboard=True)
     keybord.add(*[KeyboardButton(f"{i}") for i in range (1,4)])
     return keybord
 
-def back_button():
+def back_button() -> types.ReplyKeyboardMarkup:
     keybord = ReplyKeyboardMarkup(resize_keyboard=True)
     keybord.add(KeyboardButton("Back to menu"))
     return keybord
 
 
-def confirm_button():
+def confirm_button() -> types.InlineKeyboardMarkup:
     keybord = InlineKeyboardMarkup()
     keybord.add(InlineKeyboardButton("Edit",callback_data="edit"),
                 InlineKeyboardButton("Confirm",callback_data="confirm"))
     return keybord
 
 
-def edit_date():
+def edit_date() -> types.InlineKeyboardMarkup:
     keybord = InlineKeyboardMarkup()
     keybord.add(InlineKeyboardButton("Edit date",callback_data="edit_date"))
     return keybord
 
-def create_confirm():
+def create_confirm() -> types.InlineKeyboardMarkup:
     keybord = InlineKeyboardMarkup()
 
     keybord.add(InlineKeyboardButton("edit",callback_data = "back_to_write"),InlineKeyboardButton("confirm",callback_data = "confirm"))
