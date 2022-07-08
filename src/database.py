@@ -15,10 +15,10 @@ def create_table(c : sqlite3.Cursor):
                 task text
                     )""")
 
-def insert_data(c : sqlite3.Cursor, data : datetime , text: str) -> list:
+def insert_data(c : sqlite3.Cursor, data : datetime , text: str):
     c.execute("INSERT INTO tasks VALUES('{}','{}')".format(data,text))
 
-def day_task(c : sqlite3.Cursor, date = str(datetime.date.today())):
+def day_task(c : sqlite3.Cursor, date = str(datetime.date.today())) -> list:
     c.execute("SELECT data,task FROM tasks WHERE data = :date",{'date': date})
     data_from_table = c.fetchall()
     if data_from_table == []: return "nothing"
