@@ -1,5 +1,6 @@
 from ctypes import resize
 from gc import callbacks
+from unittest.mock import call
 from telebot import TeleBot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton,ReplyKeyboardMarkup,KeyboardButton
 
@@ -7,24 +8,26 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton,ReplyKeyboa
 EMTPY_FIELD = '1'
 
 def generate_start_button():
-    keybord = InlineKeyboardMarkup(row_width=2)#,one_time_keyboard = True)
-    
-    keybord.add(InlineKeyboardButton("view task",callback_data="view"),
-                InlineKeyboardButton("create task",callback_data="create"))
-    
-    keybord.add(InlineKeyboardButton("view calendar",callback_data="cal"))
+    keybord = ReplyKeyboardMarkup(resize_keyboard=True)
+    keybord.add(*[KeyboardButton(f"{i}") for i in range (1,4)])
+    return keybord
 
+def back_button():
+    keybord = ReplyKeyboardMarkup(resize_keyboard=True)
+    keybord.add(KeyboardButton("Back to menu"))
     return keybord
 
 
-def generate_create_task_req():
+def confirm_button():
     keybord = InlineKeyboardMarkup()
-    #keybord_screen = ReplyKeyboardMarkup(resize_keyboard = True)
+    keybord.add(InlineKeyboardButton("Edit",callback_data="edit"),
+                InlineKeyboardButton("Confirm",callback_data="confirm"))
+    return keybord
 
-    #keybord_screen.add(KeyboardButton("todo"),KeyboardButton("todo"),KeyboardButton("todo"))
 
-    keybord.add(InlineKeyboardButton("back",callback_data = "back_to_start"))
-    
+def edit_date():
+    keybord = InlineKeyboardMarkup()
+    keybord.add(InlineKeyboardButton("Edit date",callback_data="edit_date"))
     return keybord
 
 def create_confirm():

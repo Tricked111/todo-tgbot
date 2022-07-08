@@ -1,20 +1,22 @@
 """ todo telgram bot 
 autor: Tricked111 """
 
-from email import message
+from telebot.callback_data import CallbackData, CallbackDataFilter
 from telebot import types,TeleBot
-from datetime import date, datetime
-from src.keybord import generate_start_button,generate_create_task_req
-from src.database import create_connect,create_cursor,create_table,insert_data,print_select
+from src.keybord import generate_start_button
+from src.database import create_connect,create_cursor,create_table,insert_data,today_task
 import src.database as database
 import sqlite3
 import src.keybord as key
-
+import datetime
 
 API_TOKEN = "5597070596:AAEgZMwOzZLp7IQHqurC0BUi7m5I8wrcm9w"
 bot = TeleBot(API_TOKEN)
 id : types.Message
 curs : sqlite3.Cursor
+
+
+
 
 
 @bot.message_handler(commands = ['start'])
@@ -29,14 +31,117 @@ def start_command_handler(message: types.Message):
                      "\nThis is TODO bot for you."
                      "\nPress /todo to start.")
 
-
-
 @bot.message_handler(commands = ['todo'])
 def todo_command_handler(message: types.Message):
+    bot.send_message(message.chat.id,'Menu:\n1.View tasks\n2.Create task\n3.View calendar',reply_markup=generate_start_button())
+
+@bot.message_handler(content_types=['text'])
+def start_command(message : types.Message):
+    if message.text == "1":
+        pass
+        show_tasks(message) 
+    if message.text == "2":
+        msg = bot.send_message(message.chat.id,"Write task",reply_markup=key.back_button())
+        bot.register_next_step_handler(msg,create_task)
+    if message.text == "3":
+         bot.send_message(message.chat.id,"3tut")
+    if message.text == "Back to menu":
+        todo_command_handler(message)
+
+
+
+
+def show_tasks(message: types.Message):
+    global curs
+    
+    bot.send_message(message.chat.id,"Task list",reply_markup=key.back_button())
+    bot.send_message(message.chat.id,f"Today:\n{today_task(curs)}")
+    
+
+
+
+
+def create_task(message : types.Message):
+    if message.text == "Back to menu":
+        todo_command_handler(message)
+    else:
+        bot.send_message(message.chat.id,
+                        f"Today",reply_markup=key.edit_date())
+        bot.send_message(message.chat.id,
+                        f"{message.text}",
+                        reply_markup=key.confirm_button())
+
+
+
+@bot.callback_query_handler(func=lambda call : call.data == "edit")
+def back_to_edit(call : types.CallbackQuery):
+    msg = bot.send_message(call.message.chat.id,"Write task")
+    bot.register_next_step_handler(msg,create_task)
+
+
+@bot.callback_query_handler(func=lambda call : call.data == "confirm")
+def confirm(call : types.CallbackQuery):
+    global curs
+    insert_data(curs,datetime.date.today(),call.message.text)
+    bot.send_message(call.message.chat.id,"Task was addet!!")
+    todo_command_handler(call.message)
+
+@bot.callback_query_handler(func=lambda call : call.data == "edit_date")
+def back_to_edit(call : types.CallbackQuery):
+    pass
+
+
+
+""" def confirm_or_edit(message: types.Message):
+    global curs
+    if message.text == "Edit":
+        msg = bot.send_message(message.chat.id,"Write task",reply_markup=key.back_button())
+        bot.register_next_step_handler(msg,create_task)
+    if message.text == "Confirm":
+        #insert_data(curs,f"{text}")
+        todo_command_handler(message) """
+
+
+""" @bot.message_handler(commands = ['todo'])
+def todo_command_handler(message: types.Message):
     bot.send_message(message.chat.id,'Task list',reply_markup=generate_start_button())
+    
 
 
-@bot.callback_query_handler(func=lambda call: True)
+@bot.callback_query_handler(func=lambda call: call.data == "view")
+def view_state(call : types.CallbackQuery):
+    pass
+
+
+
+@bot.callback_query_handler(func=lambda call: call.data == "create")
+def create_stae(call : types.CallbackQuery):
+    msg = bot.send_message(call.message.chat.id,'Send task',reply_markup=generate_create_task_req())
+    bot.register_next_step_handler(msg,write_task)
+
+    #if call.data == "back_menu":
+    #    bot.send_message(call.message.chat.id, "TEST")
+
+def write_task(message : types.Message):
+    bot.send_message(message.chat.id,f'Today: {message.text}',reply_markup=key.create_confirm())
+    #bot.edit_message_text(chat_id=message.chat.id, message_id=message.message_id,
+    #                      text=f'Today: {message.text}', reply_markup=key.create_confirm())
+
+@bot.callback_query_handler(func=lambda call: call.data == "cal")
+def cal_state(call : types.CallbackQuery):
+    pass
+
+
+@bot.callback_query_handler(func=lambda call:True)
+def back(call : types.CallbackQuery):
+    if call.data == "back_to_start":
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                          text='Task list:', reply_markup=generate_start_button()) """
+    
+
+
+
+""" @bot.callback_query_handler(func=lambda call: True)
 def task_manage(call: types.CallbackQuery):
     global id,curs
     if call.data == "view":
@@ -46,10 +151,11 @@ def task_manage(call: types.CallbackQuery):
         msg = bot.send_message(call.message.chat.id,'Send task',reply_markup=generate_create_task_req())
         bot.register_next_step_handler(msg,write_task)
     
-    elif call.data == "cal":
-        bot.send_message(call.message.chat.id,'cal TODO')
+    #elif call.data == "cal":
+    #    bot.send_message(call.message.chat.id,'cal TODO')
    
     elif call.data == "back_to_start":
+        bot.send_message(call.message.chat.id,"Main menu")
         todo_command_handler(id)
     
     elif call.data == "back_to_write":
@@ -58,11 +164,11 @@ def task_manage(call: types.CallbackQuery):
     
     elif call.data == "confirm":
         bot.send_message(call.message.chat.id,f"Apply to task list\n\n{call.message.text}")
-        insert_data(curs,"date.today()",call.message.text)
+        insert_data(curs,call.message.text)
         todo_command_handler(id)
 
 def write_task(message : types.Message):
-    bot.send_message(message.chat.id,f'Today: {message.text}',reply_markup=key.create_confirm())
+    bot.send_message(message.chat.id,f'Today: {message.text}',reply_markup=key.create_confirm()) """
 
 
 
@@ -105,4 +211,4 @@ def write_task(message : types.Message):
 
 
 if __name__ == "__main__":
-    bot.polling()
+    bot.infinity_polling()
